@@ -1,11 +1,11 @@
 {
-  "name": "@chevtek/poker-engine",
+  "name": "@bradyy/poker-engine",
   "version": "1.2.14",
   "description": "A headless no-limit Texas Hold'em engine written completely in node.",
   "main": "./build/index.js",
   "scripts": {
     "version": "node ./generate-readme.js && git add ./README.md",
-    "postversion": "npm publish && git push",
+    "postversion": "npm publish --access=public && git push",
     "install": "npm run build",
     "clean": "rimraf ./build",
     "build": "npm run clean &&tsc --project ./tsconfig.json"
@@ -19,12 +19,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chevtek/poker-engine.git"
-  },
-  "author": {
-    "name": "Chev",
-    "email": "chev@chevtek.io",
-    "url": "https://chevtek.io"
+    "url": "git+https://github.com/bradyy/poker-engine.git"
   },
   "license": "ISC",
   "dependencies": {

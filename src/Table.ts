@@ -14,43 +14,48 @@ export class Table {
   public handNumber: number = 0;
   public lastPosition?: number;
   public lastRaise?: number;
-  public players: (Player|null)[] = [null, null, null, null, null, null, null, null, null, null];
+  public players: (Player | null)[] = [];
   public pots: Pot[] = [];
   public smallBlindPosition?: number;
   public winners?: Player[];
 
-  constructor (
+  constructor(
     public buyIn: number = 1000,
     public smallBlind: number = 5,
-    public bigBlind: number = 10
+    public bigBlind: number = 10,
+    public playerLimit: number = 6
   ) {
     if (smallBlind >= bigBlind) {
       throw new Error("The small blind must be less than the big blind.");
     }
+
+    if (playerLimit < 2) {
+      throw new Error("There must be at least 2 players.")
+    }
   }
 
-  get actingPlayers () {
+  get actingPlayers() {
     return this.players.filter(player => player && !player.folded
       && player.stackSize > 0
       && (!this.currentBet || !player.raise || (this.currentBet && player.bet < this.currentBet))
     ) as Player[];
   }
 
-  get activePlayers () {
+  get activePlayers() {
     return this.players.filter(player => player && !player.folded) as Player[];
   }
 
-  get bigBlindPlayer () {
+  get bigBlindPlayer() {
     if (this.bigBlindPosition === undefined) return;
     return this.players[this.bigBlindPosition];
   }
 
-  get currentActor () {
+  get currentActor() {
     if (this.currentPosition === undefined) return;
     return this.players[this.currentPosition];
   }
-  
-  get currentPot () {
+
+  get currentPot() {
     // If there is no pot, create one.
     if (this.pots.length === 0) {
       const newPot = new Pot();
@@ -60,24 +65,24 @@ export class Table {
     return this.pots[this.pots.length - 1];
   }
 
-  get dealer () {
+  get dealer() {
     if (this.dealerPosition === undefined) return;
     return this.players[this.dealerPosition];
   }
 
-  get lastActor () {
+  get lastActor() {
     if (this.lastPosition === undefined) return;
     return this.players[this.lastPosition];
   }
 
-  get sidePots () {
+  get sidePots() {
     if (this.pots.length <= 1) {
       return;
     }
     return this.pots.slice(0, this.pots.length - 1)
   }
 
-  get smallBlindPlayer () {
+  get smallBlindPlayer() {
     if (this.smallBlindPosition === undefined) return;
     return this.players[this.smallBlindPosition];
   }
@@ -120,7 +125,8 @@ export class Table {
 
   sitDown(id: string, buyIn: number, seatNumber?: number) {
     // If there are no null seats then the table is full.
-    if (this.players.filter(player => player === null).length === 0) {
+
+    if (this.players.length >= this.playerLimit) {
       throw new Error("The table is currently full.");
     }
     if (buyIn < this.buyIn) {
@@ -134,14 +140,22 @@ export class Table {
       throw new Error("There is already a player in the requested seat.");
     }
     const newPlayer = new Player(id, buyIn, this);
+
     if (!seatNumber) {
       seatNumber = 0;
-      while (this.players[seatNumber] !== null) {
+
+      while (true) {
+        if (this.players[seatNumber] == null) {
+          break;
+        }
+
         seatNumber++;
-        if (seatNumber >= this.players.length) {
-          throw new Error("No available seats!");
+
+        if (seatNumber >= this.playerLimit) {
+          throw new Error("There are no available seats.");
         }
       }
+
     }
     this.players[seatNumber] = newPlayer;
     if (this.currentRound) {
@@ -187,7 +201,7 @@ export class Table {
     return playersToStandUp;
   }
 
-  cleanUp () {
+  cleanUp() {
     // Remove players who left;
     const leavingPlayers = this.players.filter(player => player && player.left);
     leavingPlayers.forEach(player => player && this.standUp(player));
@@ -197,7 +211,7 @@ export class Table {
     bustedPlayers.forEach(player => player && this.standUp(player));
 
     // Reset player bets, hole cards, and fold status.
-    this.players.forEach(player => { 
+    this.players.forEach(player => {
       if (!player) return;
       player.bet = 0;
       delete player.raise;
@@ -220,7 +234,7 @@ export class Table {
     delete this.currentBet;
   }
 
-  dealCards () {
+  dealCards() {
     // Check for active round and throw if there is one.
     if (this.currentRound) {
       throw new Error("There is already an active hand!");
@@ -246,7 +260,9 @@ export class Table {
 
     // Force small and big blind bets and set current bet amount.
     const sbPlayer = this.players[this.smallBlindPosition!]!;
+
     const bbPlayer = this.players[this.bigBlindPosition!]!
+
     if (this.smallBlind > sbPlayer.stackSize) {
       sbPlayer.bet = sbPlayer.stackSize;
       sbPlayer.stackSize = 0;
@@ -287,8 +303,7 @@ export class Table {
     });
   }
 
-  nextAction () {
-
+  nextAction() {
     // See if everyone has folded.
     if (this.activePlayers.length === 1) {
       this.showdown();
@@ -316,7 +331,7 @@ export class Table {
     }
   }
 
-  gatherBets () {
+  gatherBets() {
 
     // Obtain all players who placed bets.
     const bettingPlayers = this.players.filter(player => player && player.bet > 0);
@@ -380,7 +395,7 @@ export class Table {
     this.pots.forEach(pot => pot.eligiblePlayers = pot.eligiblePlayers.filter(player => !player.folded && !player.left));
   }
 
-  nextRound () {
+  nextRound() {
 
     const resetPosition = () => {
       // Set action to first player after dealer.
@@ -471,8 +486,8 @@ export class Table {
         break;
     }
   }
-  
-  showdown () {
+
+  showdown() {
     delete this.currentRound;
     delete this.currentPosition;
     delete this.lastPosition;
@@ -499,13 +514,13 @@ export class Table {
 
     // Distribute pots and mark winners.
     this.pots.forEach(pot => {
-      pot.winners = findWinners(pot.eligiblePlayers); 
+      pot.winners = findWinners(pot.eligiblePlayers);
       const award = pot.amount / pot.winners!.length;
       pot.winners!.forEach(player => player.stackSize += award);
     });
   }
 
-  newDeck (): Card[] {
+  newDeck(): Card[] {
     const newDeck: Card[] = [];
     Object.keys(CardSuit).forEach(suit => {
       Object.keys(CardRank).forEach(rank => {
