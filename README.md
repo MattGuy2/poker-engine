@@ -1,15 +1,11 @@
-# @chevtek/poker-engine v1.2.14
+# @bradyy/poker-engine v1.2.14
 
 A headless no-limit Texas Hold'em engine written completely in node.
-
-> Chev  
-> chev@chevtek.io  
-> https://chevtek.io  
 
 ## Installation
 
 ```bash
-npm install @chevtek/poker-engine
+npm install @bradyy/poker-engine
 ```
 
 ## Usage
@@ -17,7 +13,7 @@ npm install @chevtek/poker-engine
 This engine is designed around an instance of a `Table`. Simply create a new table, seat players, and deal the cards!
 
 ```js
-const { Table } = require("@chevtek/poker-engine");
+const { Table } = require("@bradyy/poker-engine");
 
 // new Table(minBuyIn = 1000, smallBlind = 5, bigBlind = 10);
 const table = new Table();
@@ -65,7 +61,7 @@ console.log(table.winners);
 ## Example of a complete hand
 
 ```js
-const { Table } = require("@chevtek/poker-engine");
+const { Table } = require("@bradyy/poker-engine");
 
 const table = new Table();
 
