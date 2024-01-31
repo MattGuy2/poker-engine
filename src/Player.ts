@@ -107,7 +107,7 @@ export class Player {
       // Set last action to the player behind this one.
       this.table.lastPosition = this.table.currentPosition! - 1;
       if (this.table.lastPosition === -1) this.table.lastPosition = this.table.players.length - 1;
-      while (!this.table.lastActor || !this.table.actingPlayers.includes(this.table.lastActor)) {
+      while (this.table.actingPlayers.length != 0 && (!this.table.lastActor || !this.table.actingPlayers.includes(this.table.lastActor))) {
         this.table.lastPosition--;
         if (this.table.lastPosition === -1) this.table.lastPosition = this.table.players.length - 1;
       }
