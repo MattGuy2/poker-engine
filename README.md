@@ -1,4 +1,4 @@
-# @MattGuy2/poker-engine v1.2.14
+# @sMattGuy/poker-engine v1.2.14
 
 A headless no-limit Texas Hold'em engine written completely in node.
 Forked from @bradyy/poker-engine v1.2.14
@@ -6,7 +6,7 @@ Forked from @bradyy/poker-engine v1.2.14
 ## Installation
 
 ```bash
-npm install @MattGuy2/poker-engine
+npm install @sMattGuy/poker-engine
 ```
 
 ## Usage
@@ -14,7 +14,7 @@ npm install @MattGuy2/poker-engine
 This engine is designed around an instance of a `Table`. Simply create a new table, seat players, and deal the cards!
 
 ```js
-const { Table } = require("@MattGuy2/poker-engine");
+const { Table } = require("@sMattGuy/poker-engine");
 
 // new Table(minBuyIn = 1000, smallBlind = 5, bigBlind = 10);
 const table = new Table();
@@ -62,7 +62,7 @@ console.log(table.winners);
 ## Example of a complete hand
 
 ```js
-const { Table } = require("@MattGuy2/poker-engine");
+const { Table } = require("@sMattGuy/poker-engine");
 
 const table = new Table();
 
